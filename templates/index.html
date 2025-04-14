@@ -17,7 +17,7 @@
             <tbody>
                 {% for expense in expenses %}
                 <tr>
-                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.date_display }}</td> <!-- Use date_display -->
                     <td>${{ expense.amount|round(2) }}</td>
                     <td>{{ expense.category }}</td>
                     <td>{{ expense.description }}</td>
@@ -57,7 +57,7 @@
 </div>
 
 <script>
-    // @ts-nocheck  // Suppress TypeScript warnings for Jinja2 syntax
+    // @ts-nocheck
     window.chartData = {
         categories: {{ categories|tojson }},
         amounts: {{ amounts|tojson }},
