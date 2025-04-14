@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 #Reads expenses from CSV file. Return empty if non-existent.
 def read_expenses(file_path):
@@ -15,4 +16,5 @@ def write_expense(file_path, expense):
     df = read_expenses(file_path) 
     new_row = pd.DataFrame([expense])
     df = pd.concat([df, new_row], ignore_index=True)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
     df.to_csv(file_path, index=False)
