@@ -15,7 +15,21 @@ function createCategoryChart(categories, amounts) {
         },
         options: {
             scales: {
-                y: { beginAtZero: true }  // Ensures y-axis starts at 0.
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `$${context.parsed.y.toLocaleString()} in ${context.label}`
+                    }
+                }
             }
         }
     });
@@ -38,11 +52,26 @@ function createRunningTotalChart(dates, running_totals) {
         },
         options: {
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `$${context.parsed.y.toLocaleString()} on ${context.label}`
+                    }
+                }
             }
         }
     });
 }
+
 
 // initlialise charts after page load
 function initCharts() {
