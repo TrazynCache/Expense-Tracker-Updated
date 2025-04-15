@@ -1,7 +1,9 @@
+from re import S
 from flask import Flask, render_template, request, redirect, url_for
 from modules.data_handler import read_expenses, add_expense as add_expense_data
 from modules.expense_processor import calculate_total, calculate_average, calculate_running_total
 import pandas as pd
+import os
 
 app = Flask(__name__)
 CSV_FILE = 'data/expenses.csv'
@@ -46,6 +48,35 @@ def add_expense():
     df = read_expenses('data/expenses.csv')
     categories = sorted(df['category'].dropna().unique().tolist())
     return render_template('add_expense.html', categories=categories)
+
+@app.route('/edit/<int:index>', methods=['GET', 'POST'])
+def edit_expense(index):    
+    df = read_expenses(CSV_FILE)
+    if index < 0 or index >= len(df):
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        df.iloc[index] = {
+            'date': pd.to_datetime(request.form['date']),
+            'amount': float(request.form['amount']),
+            'category': request.form['category'],
+            'description': request.form['description']
+        }
+        os.makedirs(os.path.dirname(CSV_FILE), exist_ok=True)
+        df.to_csv(CSV_FILE, index=False)
+        return redirect(url_for('index'))
+    expense = df.iloc[index].to_dict()
+    expense['date_display'] = pd.to_datetime(expense['date']).strftime('%Y-%m-%d')
+    categories = sorted(df['category'].dropna().unique().tolist())
+    return render_template('edit_expense.html', expense=expense, index=index, categories=categories)
+
+@app.route('/delete/<int:index>', methods=['POST'])
+def delete_expense(index):
+    df = read_expenses(CSV_FILE)
+    if 0 <= index < len(df):
+        df = df.drop(index).reset_index(drop=True)
+        os.makedirs(os.path.dirname(CSV_FILE), exist_ok=True)
+        df.to_csv(CSV_FILE, index=False)
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
