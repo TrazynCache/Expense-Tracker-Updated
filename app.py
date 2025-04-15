@@ -11,9 +11,14 @@ CSV_FILE = 'data/expenses.csv'
 @app.route('/')
 def index():
     df = read_expenses(CSV_FILE)
+    categories = sorted(df['category'].dropna().unique().tolist())
+    selected_category = request.args.get('category') #Allows for filtering
+    if selected_category:
+        df = df[df['category'] == selected_category]
     total = calculate_total(df)
     average = calculate_average(df) if not df.empty else 0
     category_totals = df.groupby('category')['amount'].sum()
+    category_labels = category_totals.index.tolist()
     categories = category_totals.index.tolist()
     amounts = category_totals.values.tolist()
     if not df.empty:
@@ -32,6 +37,8 @@ def index():
                           total=total,
                           average=average,
                           categories=categories,
+                          selected_category=selected_category,
+                          category_labels=category_labels,
                           amounts=amounts,
                           dates=dates,
                           running_totals=running_totals)

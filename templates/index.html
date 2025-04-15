@@ -1,75 +1,91 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Expense Tracker{% endblock %}
 {% block content %}
-<h1 class="text-center mb-4">Your Expenses</h1>
-
-<div class="card mb-4">
-    <div class="card-header">Expense List</div>
-    <div class="card-body">
-        <table class="table table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for expense in expenses %}
-                <tr>
-                    <td>{{ expense.date_display }}</td>
-                    <td>${{ expense.amount|round(2) }}</td>
-                    <td>{{ expense.category }}</td>
-                    <td>{{ expense.description }}</td>
-                    <td>
-                        <a href="{{ url_for('edit_expense', index=loop.index0) }}" class="btn btn-sm btn-warning">Edit</a>
-                       <form action="{{ url_for('delete_expense', index=loop.index0) }}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
-                    </td>
-                </tr>
+<div class="container mt-4">
+    <h2>Expense Tracker</h2>
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-header">Summary</div>
-    <div class="card-body">
-        <p><strong>Total Expenses:</strong> ${{ total|round(2) }}</p>
-        <p><strong>Average Expense:</strong> ${{ average|round(2) }}</p>
-    </div>
-</div>
-
-<h2 class="text-center mb-4">Visual Insights</h2>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Expenses by Category</div>
-            <div class="card-body">
-                <canvas id="categoryChart"></canvas>
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Expenses</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            <tr>
+                                <td>{{ expense.date_display }}</td>
+                                <td>${{ expense.amount|round(2) }}</td>
+                                <td>{{ expense.category }}</td>
+                                <td>{{ expense.description }}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ url_for('edit_expense', index=loop.index0) }}" class="btn btn-sm btn-warning">Edit</a>
+                                        <form action="{{ url_for('delete_expense', index=loop.index0) }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Summary</h5>
+                    <p>Total: ${{ total|round(2) }}</p>
+                    <p>Average: ${{ average|round(2) }}</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Running Total Over Time</div>
-            <div class="card-body">
-                <canvas id="runningTotalChart"></canvas>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Expenses by Category</h5>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Running Total Over Time</h5>
+                    <canvas id="runningTotalChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 <script>
-    // @ts-nocheck
     window.chartData = {
-        categories: {{ categories|tojson }},
-        amounts: {{ amounts|tojson }},
-        dates: {{ dates|tojson }},
-        running_totals: {{ running_totals|tojson }}
+        categories: {{ category_labels | tojson }},
+        amounts: {{ amounts | tojson }},
+        dates: {{ dates | tojson }},
+        running_totals: {{ running_totals | tojson }}
     };
 </script>
 {% endblock %}
