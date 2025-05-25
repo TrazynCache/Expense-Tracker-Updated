@@ -3,6 +3,8 @@
 ## Overview
 The Expense Tracker is a web application designed to track expenses, categorize them, and visualize spending patterns. This Minimum Viable Product (MVP) allows users to add expenses, view a summary, and see visual insights through charts. It serves as a demonstration of basic expense tracking functionality.
 
+![Expense tracker front](https://github.com/user-attachments/assets/573ab494-f8de-452f-9a60-449d46249525)
+
 ### Features
 - **Add Expenses**: Input expenses with date, amount, category, and description.
 - **Expense List**: View all expenses in a table.
